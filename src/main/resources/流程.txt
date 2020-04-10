@@ -1,0 +1,15 @@
+1.创建myrealm类
+    重写doGetAuthenticationInfo和doGetAuthorizationInfo方法
+2.创建shiroConfig类（以下皆为bean方法）
+    添加myrealm方法（）
+    编写securityManager方法（在此处设置添加myrealm方法）
+    编写方法shirFilter方法（在此处设置添加securityManager）
+3.创建加密
+    在注册加密
+    在shiroConfig类中添加HashedCredentialsMatcher，并在myrealm方法中设值
+    在myrealm类中添加加密（或盐）
+
+4.拦截器
+https://blog.csdn.net/u010811939/article/details/84107715?depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3&utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3
+
+
