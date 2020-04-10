@@ -1,12 +1,14 @@
 package com.yiyuclub.springshiro.config;
 
+import com.yiyuclub.springshiro.filter.JwtTokenFilter;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
+import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.apache.shiro.mgt.SecurityManager;
 
+import javax.servlet.Filter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -50,6 +52,15 @@ public class ShiroConfig {
 
         ShiroFilterFactoryBean factoryBean = new ShiroFilterFactoryBean();
         factoryBean.setSecurityManager(securityManager);
+
+
+        /*重要，设置自定义拦截器，当访问某些自定义url时，使用这个filter进行验证*/
+        Map<String, Filter> filters = new LinkedHashMap<String, Filter>();
+        //如果map里面key值为authc,表示所有名为authc的过滤条件使用这个自定义的filter
+        //map里面key值为myFilter,表示所有名为myFilter的过滤条件使用这个自定义的filter，具体见下方
+        filters.put("myFilter", jwtTokenFilter());
+        factoryBean.setFilters(filters);
+
         // setLoginUrl 如果不设置值，默认会自动寻找Web工程根目录下的"/login.jsp"页面 或 "/login" 映射
         factoryBean.setLoginUrl("/login");
         // 设置无权限时跳转的 url;
@@ -90,10 +101,10 @@ public class ShiroConfig {
      */
     @Bean
     public MyRealm MyRealm() {
-         MyRealm myrealm= new MyRealm();
+        MyRealm myrealm = new MyRealm();
         //添加加密
         myrealm.setCredentialsMatcher(hashedCredentialsMatcher());
-         //关闭缓存
+        //关闭缓存
         myrealm.setCachingEnabled(false);
 
         return myrealm;
@@ -101,10 +112,10 @@ public class ShiroConfig {
 
     /**
      * 这里需要设置成与PasswordEncrypter类相同的加密规则
-     *
+     * <p>
      * 在doGetAuthenticationInfo认证登陆返回SimpleAuthenticationInfo时会使用hashedCredentialsMatcher
      * 把用户填入密码加密后生成散列码与数据库对应的散列码进行对比
-     *
+     * <p>
      * HashedCredentialsMatcher会自动根据AuthenticationInfo的类型是否是SaltedAuthenticationInfo来获取credentialsSalt盐
      *
      * @return
@@ -116,5 +127,12 @@ public class ShiroConfig {
         hashedCredentialsMatcher.setHashIterations(1024);// 散列次数, 与注册时使用的散列册数相同
         hashedCredentialsMatcher.setStoredCredentialsHexEncoded(true);// 生成16进制, 与注册时的生成格式相同
         return hashedCredentialsMatcher;
+    }
+
+
+
+    @Bean
+    public JwtTokenFilter jwtTokenFilter() {
+        return new JwtTokenFilter();
     }
 }

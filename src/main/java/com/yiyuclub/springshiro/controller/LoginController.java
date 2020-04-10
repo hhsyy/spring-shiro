@@ -24,11 +24,8 @@ public class LoginController {
     public List<IdeaUser> login(String username, String password) {
         List<IdeaUser> list = null;
         try {
-            MD5Pwd(password);
             Subject subject = SecurityUtils.getSubject();
-
             UsernamePasswordToken token = new UsernamePasswordToken(username, password);
-
             subject.login(token);
             System.out.println("成功");
             list = userService.getUserList();
