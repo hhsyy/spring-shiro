@@ -44,6 +44,4 @@ public class JwtTokenFilter extends FormAuthenticationFilter {
         writer.close();
         return false;
     }
-
-
 }
